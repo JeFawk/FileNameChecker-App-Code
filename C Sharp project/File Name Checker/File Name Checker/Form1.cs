@@ -1,6 +1,7 @@
 // ctrl + m + o to collapse all
 
 using System.Diagnostics;
+using System.IO;
 using System.Timers;
 
 namespace File_Name_Checker
@@ -12,6 +13,8 @@ namespace File_Name_Checker
             public const Int32 BUFFER_SIZE = 512; // Unmodifiable
             public static String FILE_NAME = "Output.txt"; // Modifiable
             public static readonly String CODE_PREFIX = "US-"; // Unmodifiable
+
+            public static string[] InvalidCharacters = new string[100];
 
             public static bool IsWorking = false;
         }
@@ -26,6 +29,8 @@ namespace File_Name_Checker
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Interval = 1000;
             aTimer.Enabled = true;
+
+            toolTip1.SetToolTip(MaxLengthCheckGroupbox, "If path is encrypted, on Synology the max length is 143 characters. Not encrypted on Synology it's 256 characters.");
 
         }
 
@@ -105,6 +110,7 @@ namespace File_Name_Checker
         {
             StartButton.Enabled = true;
             StopButton.Enabled = false;
+            InvalidCharactersLabel.Enabled = true;
             ResultsAdd("Attempting to force stop.");
             Globals.IsWorking = false;
         }
@@ -113,11 +119,14 @@ namespace File_Name_Checker
         {
             StartButton.Enabled = false;
             StopButton.Enabled = true;
+            InvalidCharactersLabel.Enabled = false;
 
             ResultsTextBox.Text = "";
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
+            Globals.InvalidCharacters = InvalidCharactersTextbox.Text.Split(' ');
 
             Globals.IsWorking = true;
             StatusLabelUpdate();
@@ -133,6 +142,7 @@ namespace File_Name_Checker
 
             StartButton.Enabled = true;
             StopButton.Enabled = false;
+            InvalidCharactersLabel.Enabled = true;
         }
 
         private void CheckRecursive()
@@ -144,16 +154,8 @@ namespace File_Name_Checker
                 {
                     if (Globals.IsWorking)
                     {
-                        if (MaxLengthCheckbox.Checked)
-                        {
-                            if (fl.Name.Length >= Convert.ToInt32(MaxLengthTextBox.Text))
-                            {
-                                ResultsAdd("");
-                                ResultsAdd("File name too long: " + fl.Name);
-                                ResultsAdd("Location: " + fl.FullName);
-                                ResultsAdd("");
-                            }
-                        }
+                        CheckOne(fl);
+                        
                     }
                     else break;
                     
@@ -164,16 +166,8 @@ namespace File_Name_Checker
                 {
                     if (Globals.IsWorking)
                     {
-                        if (MaxLengthCheckbox.Checked)
-                        {
-                            if (dr.Name.Length >= Convert.ToInt32(MaxLengthTextBox.Text))
-                            {
-                                ResultsAdd("");
-                                ResultsAdd("Folder name too long: " + dr.Name);
-                                ResultsAdd("Location: " + dr.FullName);
-                                ResultsAdd("");
-                            }
-                        }
+                        CheckOne(dr);
+                        
                     }
                     else break;
 
@@ -185,6 +179,34 @@ namespace File_Name_Checker
             }
         }
 
+        private void CheckOne(FileInfo FileOrFolder)
+        {
+            if (MaxLengthCheckbox.Checked)
+            {
+                if (FileOrFolder.Name.Length >= Convert.ToInt32(MaxLengthTextbox.Text))
+                {
+                    ResultsAdd("");
+                    ResultsAdd(IsFileOrFolderPretty(FileOrFolder, true) + " name too long: " + FileOrFolder.Name);
+                    ResultsAdd("Location: " + FileOrFolder.FullName);
+                    ResultsAdd("");
+                }
+            }
+            if (InvalidCharactersCheckbox.Checked)
+            {
+                foreach (string Character in Globals.InvalidCharacters)
+                {
+                    if (FileOrFolder.Name.IndexOf(Character) != -1) 
+                    {
+                        ResultsAdd("");
+                        ResultsAdd(IsFileOrFolderPretty(FileOrFolder, true) + " contains invalid characters: " + FileOrFolder.Name);
+                        ResultsAdd("Location: " + FileOrFolder.FullName);
+                        ResultsAdd("");
+                    }
+                }
+            }
+
+        }
+
         // Specify what you want to happen when the Elapsed event is raised.
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
@@ -194,6 +216,41 @@ namespace File_Name_Checker
         private void StopButton_Click(object sender, EventArgs e)
         {
             ForceStop();   
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FileOrFolder"></param>
+        /// <returns>0 for file, 1 for directory</returns>
+        private int IsFileOrFolder(FileInfo FileOrFolder)
+        {
+            var attributes = File.GetAttributes(FileOrFolder.FullName);
+
+            bool isDirectory = attributes.HasFlag(FileAttributes.Directory);
+
+            if (isDirectory) return 1;
+            else return 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FileOrFolder"></param>
+        /// <param name="IsCapitalFirstLetter"></param>
+        /// <returns>File or file / Folder or folder</returns>
+        private string IsFileOrFolderPretty(FileInfo FileOrFolder, bool IsCapitalFirstLetter)
+        {
+            if (IsFileOrFolder(FileOrFolder) == 0)
+            {
+                if (IsCapitalFirstLetter) return "File";
+                else return "file";
+            }
+            else
+            {
+                if (IsCapitalFirstLetter) return "Folder";
+                else return "folder";
+            }
         }
     }
 }
