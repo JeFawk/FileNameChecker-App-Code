@@ -1,7 +1,6 @@
 // ctrl + m + o to collapse all
 
 using System.Diagnostics;
-using System.IO;
 using System.Timers;
 
 namespace File_Name_Checker
@@ -10,12 +9,7 @@ namespace File_Name_Checker
     {
         public static class Globals
         {
-            public const Int32 BUFFER_SIZE = 512; // Unmodifiable
-            public static String FILE_NAME = "Output.txt"; // Modifiable
-            public static readonly String CODE_PREFIX = "US-"; // Unmodifiable
-
             public static string[] InvalidCharacters = new string[100];
-
             public static bool IsWorking = false;
         }
 
@@ -29,9 +23,16 @@ namespace File_Name_Checker
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Interval = 1000;
             aTimer.Enabled = true;
+        }
 
-            toolTip1.SetToolTip(MaxLengthCheckGroupbox, "If path is encrypted, on Synology the max length is 143 characters. Not encrypted on Synology it's 256 characters.");
-
+        /// <summary>
+        /// Sets the active component the ResultsTextBox to avoid the input boxes to be active. This then would make the placeholder not visible and the user couldn't see the helpful information there.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            this.ActiveControl = ResultsTextBox;
         }
 
         private void StatusLabelUpdate()
@@ -74,6 +75,10 @@ namespace File_Name_Checker
             }
         }
 
+        /// <summary>
+        /// Adds logs and errors to the read-only ResultBox
+        /// </summary>
+        /// <param name="result"></param>
         private void ResultsAdd(string result)
         {
 
@@ -95,6 +100,7 @@ namespace File_Name_Checker
 
         }
 
+        #region Failed attempt to make drag drop work
         private void Form1_DragEnter(object sender, DragEventArgs e)
         {
             //if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
@@ -105,6 +111,7 @@ namespace File_Name_Checker
             //string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             //foreach (string file in files) Console.WriteLine(file);
         }
+        #endregion
 
         private void ForceStop()
         {
@@ -117,6 +124,12 @@ namespace File_Name_Checker
 
         private async void StartButton_Click(object sender, EventArgs e)
         {
+            if (PathToCheckTextBox.Text.Length < 2)
+            {
+                ResultsAdd("Path invalid, try something like \\\\NAS_Name_Here\\Folder");
+                return;
+            }
+
             StartButton.Enabled = false;
             StopButton.Enabled = true;
             InvalidCharactersLabel.Enabled = false;
@@ -147,9 +160,10 @@ namespace File_Name_Checker
 
         private void CheckRecursive()
         {
-            var files = Directory.EnumerateFiles(PathToCheckTextBox.Text, "*.*", SearchOption.AllDirectories).Select(i => new FileInfo(i));
             try
             {
+                var files = Directory.EnumerateFiles(PathToCheckTextBox.Text, "*.*", SearchOption.AllDirectories).Select(i => new FileInfo(i));
+
                 foreach (var fl in files)
                 {
                     if (Globals.IsWorking)
@@ -207,7 +221,7 @@ namespace File_Name_Checker
 
         }
 
-        // Specify what you want to happen when the Elapsed event is raised.
+        // Timer ended event
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             StatusLabelUpdate();
@@ -251,6 +265,12 @@ namespace File_Name_Checker
                 if (IsCapitalFirstLetter) return "Folder";
                 else return "folder";
             }
+        }
+
+        private void MenuAbout_Click(object sender, EventArgs e)
+        {
+            AboutForm newForm = new AboutForm();
+            newForm.ShowDialog();
         }
     }
 }
