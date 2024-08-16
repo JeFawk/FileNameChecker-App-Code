@@ -15,7 +15,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="FileNameCheckerIcon.ico" />
+    <None Remove="Resources\FileNameCheckerIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="FileNameCheckerIcon.ico" />
+    <Content Include="Resources\FileNameCheckerIcon.ico" />
   </ItemGroup>
 
   <ItemGroup>
