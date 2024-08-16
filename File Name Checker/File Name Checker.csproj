@@ -8,6 +8,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>FileNameCheckerIcon.ico</ApplicationIcon>
+    <Copyright>JeFawk from JeFawk's Spaghettorium (Andrei Pistol)</Copyright>
+    <RepositoryUrl>https://github.com/JeFawk/FileNameChecker-App-Code</RepositoryUrl>
+    <AssemblyVersion>1.0</AssemblyVersion>
+    <FileVersion>1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

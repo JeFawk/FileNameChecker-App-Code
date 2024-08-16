@@ -27,6 +27,7 @@ SOFTWARE.
 // ctrl + m + o to collapse all
 
 using System.Diagnostics;
+using System.Reflection;
 using System.Timers;
 
 namespace File_Name_Checker
@@ -45,6 +46,7 @@ namespace File_Name_Checker
 
             StatusLabelUpdate();
 
+            // Timer used to update the status label (bottom left text)
             System.Timers.Timer aTimer = new System.Timers.Timer();
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Interval = 1000;
@@ -52,13 +54,35 @@ namespace File_Name_Checker
         }
 
         /// <summary>
-        /// Sets the active component the ResultsTextBox to avoid the input boxes to be active. This then would make the placeholder not visible and the user couldn't see the helpful information there.
+        /// Form load: sets active component, sets form title based on version
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Sets the active component the ResultsTextBox to avoid the input boxes to be active. This then would make the placeholder not visible and the user couldn't see the helpful information there.
             this.ActiveControl = ResultsTextBox;
+
+            // Get the assembly that contains the form
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // Retrieve the File Version
+            AssemblyFileVersionAttribute fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
+            string fileVersionString = fileVersion.Version;
+
+            // Retrieve the Product Version (Informational Version)
+            AssemblyInformationalVersionAttribute productVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            string productVersionString = productVersion.InformationalVersion;
+
+            // Get the title attribute from the assembly (project title)
+            AssemblyTitleAttribute titleAttribute = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
+            string projectTitle = titleAttribute != null ? titleAttribute.Title : "File Name Checker";
+
+            // Get the version from the assembly
+            Version version = assembly.GetName().Version;
+
+            // Set the form's title
+            this.Text = $"{projectTitle} - v. {fileVersionString}";
         }
 
         private void StatusLabelUpdate()
