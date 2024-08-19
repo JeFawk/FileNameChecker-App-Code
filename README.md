@@ -13,6 +13,14 @@
 ![C#](https://img.shields.io/badge/language-C%23-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
+### Download
+Archive: [File Name Checker v.1.0](https://github.com/JeFawk/FileNameChecker-App-Code/releases/download/v1.0/File.Name.Checker.v.1.0.zip)
+
+Or:
+1. Clone or download the repository
+2. Navigate to the `Download\File Name Checker\` folder
+3. Run `File Name Checker.exe`
+
 ## Overview
 
 **File Name Checker** is an open-source, lightweight, and fast C# WinForms application designed to recursively scan folders and identify files that do not meet specific file name criteria. This tool is particularly beneficial for users of Synology NAS devices who encounter cryptic errors when attempting to perform encrypted backups on external devices due to file name length restrictions.
@@ -36,14 +44,6 @@
 
 - Windows OS
 - .NET Framework 6.0
-
-### Download
-Archive: [File Name Checker v.1.0](https://github.com/JeFawk/FileNameChecker-App-Code/releases/download/v1.0/File.Name.Checker.v.1.0.zip)
-
-Or:
-1. Clone or download the repository
-2. Navigate to the `Download\File Name Checker\` folder
-3. Run `File Name Checker.exe`
 
 ### Usage
 
