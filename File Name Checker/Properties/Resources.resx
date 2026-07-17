@@ -118,23 +118,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="JeFawkLogo_Smol" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\JeFawkLogo_Smol.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="JeFawkLogo_Medium" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\JeFawkLogo_Medium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
+
   <data name="GitHubIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\GitHubIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="KoFi_Medium" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\KoFi_Medium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="JeFawkLogo_Medium2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\JeFawkLogo_Medium2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
+
   <data name="GitHubIcon2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\GitHubIcon2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GitHub_Medium" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GitHub_Medium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="kofi_smol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\kofi_smol1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -142,13 +138,12 @@
   <data name="Discord_Medium" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Discord_Medium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+
   <data name="DiscordIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DiscordIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="JeFawkLogo_Smol1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\JeFawkLogo_Smol1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="GitHub_Medium" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\GitHub_Medium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+
+  <data name="SmolSpaghettoriumLogo_Small" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SmolSpaghettoriumLogo_Small.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

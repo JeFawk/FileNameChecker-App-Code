@@ -113,46 +113,6 @@ namespace File_Name_Checker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap JeFawkLogo_Medium {
-            get {
-                object obj = ResourceManager.GetObject("JeFawkLogo_Medium", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap JeFawkLogo_Medium2 {
-            get {
-                object obj = ResourceManager.GetObject("JeFawkLogo_Medium2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap JeFawkLogo_Smol {
-            get {
-                object obj = ResourceManager.GetObject("JeFawkLogo_Smol", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap JeFawkLogo_Smol1 {
-            get {
-                object obj = ResourceManager.GetObject("JeFawkLogo_Smol1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap KoFi_Medium {
             get {
                 object obj = ResourceManager.GetObject("KoFi_Medium", resourceCulture);
@@ -166,6 +126,16 @@ namespace File_Name_Checker.Properties {
         internal static System.Drawing.Bitmap kofi_smol {
             get {
                 object obj = ResourceManager.GetObject("kofi_smol", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SmolSpaghettoriumLogo_Small {
+            get {
+                object obj = ResourceManager.GetObject("SmolSpaghettoriumLogo_Small", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

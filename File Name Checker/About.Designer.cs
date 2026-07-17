@@ -45,7 +45,7 @@
             // 
             this.Discord.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Discord.Image = global::File_Name_Checker.Properties.Resources.Discord_Medium;
-            this.Discord.Location = new System.Drawing.Point(365, 79);
+            this.Discord.Location = new System.Drawing.Point(351, 157);
             this.Discord.Name = "Discord";
             this.Discord.Size = new System.Drawing.Size(35, 31);
             this.Discord.TabIndex = 23;
@@ -56,7 +56,7 @@
             // 
             this.GitHub.Cursor = System.Windows.Forms.Cursors.Hand;
             this.GitHub.Image = global::File_Name_Checker.Properties.Resources.GitHub_Medium;
-            this.GitHub.Location = new System.Drawing.Point(417, 79);
+            this.GitHub.Location = new System.Drawing.Point(351, 213);
             this.GitHub.Name = "GitHub";
             this.GitHub.Size = new System.Drawing.Size(29, 32);
             this.GitHub.TabIndex = 22;
@@ -66,10 +66,10 @@
             // JeFawkLogo
             // 
             this.JeFawkLogo.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.JeFawkLogo.Image = global::File_Name_Checker.Properties.Resources.JeFawkLogo_Medium2;
-            this.JeFawkLogo.Location = new System.Drawing.Point(91, 81);
+            this.JeFawkLogo.Image = global::File_Name_Checker.Properties.Resources.SmolSpaghettoriumLogo_Small;
+            this.JeFawkLogo.Location = new System.Drawing.Point(121, 102);
             this.JeFawkLogo.Name = "JeFawkLogo";
-            this.JeFawkLogo.Size = new System.Drawing.Size(162, 26);
+            this.JeFawkLogo.Size = new System.Drawing.Size(189, 195);
             this.JeFawkLogo.TabIndex = 21;
             this.JeFawkLogo.TabStop = false;
             this.JeFawkLogo.Click += new System.EventHandler(this.JeFawkLogo_Click);
@@ -78,7 +78,7 @@
             // 
             this.KoFi.Cursor = System.Windows.Forms.Cursors.Hand;
             this.KoFi.Image = global::File_Name_Checker.Properties.Resources.KoFi_Medium;
-            this.KoFi.Location = new System.Drawing.Point(265, 78);
+            this.KoFi.Location = new System.Drawing.Point(351, 102);
             this.KoFi.Name = "KoFi";
             this.KoFi.Size = new System.Drawing.Size(84, 29);
             this.KoFi.TabIndex = 20;
@@ -107,7 +107,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(580, 124);
+            this.ClientSize = new System.Drawing.Size(580, 347);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Discord);

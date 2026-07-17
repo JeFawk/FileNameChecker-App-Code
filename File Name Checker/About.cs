@@ -51,7 +51,7 @@ namespace File_Name_Checker
 
         private void JeFawkLogo_Click(object sender, EventArgs e)
         {
-            OpenLinkInBrowser("https://jefawk.com");
+            OpenLinkInBrowser("https://spaghettorium.com");
         }
     }
 }

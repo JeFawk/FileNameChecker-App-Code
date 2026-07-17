@@ -1,7 +1,7 @@
 #region License
 /*MIT License
 
-Copyright (c) 2024 JeFawk from JeFawk's Spaghettorium (Andrei Pistol)
+Copyright (c) 2026 JeFawk from Smol Spaghettorium (Andrei Pistol)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,29 +28,36 @@ SOFTWARE.
 
 using System.Diagnostics;
 using System.Reflection;
-using System.Timers;
 
 namespace File_Name_Checker
 {
     public partial class Form1 : Form
     {
+        private readonly System.Windows.Forms.Timer statusTimer;
+        private volatile bool scanHadErrors;
+
+        private static readonly HashSet<string> IgnoredDirectories =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                    "#recycle",
+                    "@eaDir"
+            };
         public static class Globals
         {
-            public static string[] InvalidCharacters = new string[100];
-            public static bool IsWorking = false;
+            public static volatile bool IsWorking;
+
         }
 
         public Form1()
         {
             InitializeComponent();
 
-            StatusLabelUpdate();
+            statusTimer = new System.Windows.Forms.Timer();
+            statusTimer.Interval = 1000;
+            statusTimer.Tick += StatusTimer_Tick;
+            statusTimer.Start();
 
-            // Timer used to update the status label (bottom left text)
-            System.Timers.Timer aTimer = new System.Timers.Timer();
-            aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            aTimer.Interval = 1000;
-            aTimer.Enabled = true;
+            StatusLabelUpdate();
         }
 
         /// <summary>
@@ -58,7 +65,7 @@ namespace File_Name_Checker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object? sender, EventArgs e)
         {
             // Sets the active component the ResultsTextBox to avoid the input boxes to be active. This then would make the placeholder not visible and the user couldn't see the helpful information there.
             this.ActiveControl = ResultsTextBox;
@@ -67,61 +74,47 @@ namespace File_Name_Checker
             Assembly assembly = Assembly.GetExecutingAssembly();
 
             // Retrieve the File Version
-            AssemblyFileVersionAttribute fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
-            string fileVersionString = fileVersion.Version;
-
-            // Retrieve the Product Version (Informational Version)
-            AssemblyInformationalVersionAttribute productVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            string productVersionString = productVersion.InformationalVersion;
+            AssemblyFileVersionAttribute? fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
+            string fileVersionString = fileVersion?.Version ?? "Unknown";
 
             // Get the title attribute from the assembly (project title)
-            AssemblyTitleAttribute titleAttribute = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
+            AssemblyTitleAttribute? titleAttribute = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
             string projectTitle = titleAttribute != null ? titleAttribute.Title : "File Name Checker";
 
-            // Get the version from the assembly
-            Version version = assembly.GetName().Version;
 
             // Set the form's title
             this.Text = $"{projectTitle} - v. {fileVersionString}";
         }
 
+        private void StatusTimer_Tick(object? sender, EventArgs e)
+        {
+            StatusLabelUpdate();
+        }
         private void StatusLabelUpdate()
         {
-            if (StatusLabel.InvokeRequired)
+            if (!Globals.IsWorking)
             {
-                StatusLabel.BeginInvoke(() =>
-                {
-                    if (Globals.IsWorking)
-                    {
-                        if (StatusLabel.Text == "Working")
-                            StatusLabel.Text = "Working.";
-                        else if (StatusLabel.Text == "Working.")
-                            StatusLabel.Text = "Working..";
-                        else if (StatusLabel.Text == "Working..")
-                            StatusLabel.Text = "Working...";
-                        else if (StatusLabel.Text == "Working...")
-                            StatusLabel.Text = "Working";
-                        else StatusLabel.Text = "Working";
-                    }
-                    else StatusLabel.Text = "Idle";
-
-                });
+                StatusLabel.Text = "Idle";
+                return;
             }
-            else
+
+            switch (StatusLabel.Text)
             {
-                if (Globals.IsWorking)
-                {
-                    if (StatusLabel.Text == "Working")
-                        StatusLabel.Text = "Working.";
-                    else if (StatusLabel.Text == "Working.")
-                        StatusLabel.Text = "Working..";
-                    else if (StatusLabel.Text == "Working..")
-                        StatusLabel.Text = "Working...";
-                    else if (StatusLabel.Text == "Working...")
-                        StatusLabel.Text = "Working";
-                    else StatusLabel.Text = "Working";
-                }
-                else StatusLabel.Text = "Idle";
+                case "Working":
+                    StatusLabel.Text = "Working.";
+                    break;
+
+                case "Working.":
+                    StatusLabel.Text = "Working..";
+                    break;
+
+                case "Working..":
+                    StatusLabel.Text = "Working...";
+                    break;
+
+                default:
+                    StatusLabel.Text = "Working";
+                    break;
             }
         }
 
@@ -165,116 +158,220 @@ namespace File_Name_Checker
 
         private void ForceStop()
         {
+            if (!Globals.IsWorking)
+                return;
+
+            Globals.IsWorking = false;
+            StopButton.Enabled = false;
+            ResultsAdd("Stopping...");
+
+            /*
             StartButton.Enabled = true;
             StopButton.Enabled = false;
             InvalidCharactersLabel.Enabled = true;
             ResultsAdd("Attempting to force stop.");
             Globals.IsWorking = false;
+            */
         }
 
         private async void StartButton_Click(object sender, EventArgs e)
         {
-            if (PathToCheckTextBox.Text.Length < 2)
+            
+            string rootPath = PathToCheckTextBox.Text.Trim();
+
+            if (!Directory.Exists(rootPath))
             {
-                ResultsAdd("Path invalid, try something like \\\\NAS_Name_Here\\Folder");
+                ResultsAdd("Folder does not exist or cannot be accessed.");
                 return;
             }
+
+
+            // Copy control values while still on the UI thread.
+            bool checkMaxLength = MaxLengthCheckbox.Checked;
+            bool checkInvalidCharacters = InvalidCharactersCheckbox.Checked;
+
+            int maxLength = 0;
+
+            if (checkMaxLength &&
+                (!int.TryParse(MaxLengthTextbox.Text, out maxLength) ||
+                 maxLength < 1))
+            {
+                ResultsAdd("Maximum length must be a positive whole number.");
+                return;
+            }
+
+            string[] invalidCharacters = InvalidCharactersTextbox.Text.Split(
+                ' ',
+                StringSplitOptions.RemoveEmptyEntries |
+                StringSplitOptions.TrimEntries
+            );
 
             StartButton.Enabled = false;
             StopButton.Enabled = true;
             InvalidCharactersLabel.Enabled = false;
 
-            ResultsTextBox.Text = "";
+            ResultsTextBox.Clear();
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            Globals.InvalidCharacters = InvalidCharactersTextbox.Text.Split(' ');
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
             Globals.IsWorking = true;
             StatusLabelUpdate();
             ResultsAdd("Starting");
 
-            await Task.Run(() => CheckRecursive());
-
-            sw.Stop();
-
-            Globals.IsWorking = false;
-            StatusLabelUpdate();
-            ResultsAdd("Finished. It took " + sw.Elapsed);
-
-            StartButton.Enabled = true;
-            StopButton.Enabled = false;
-            InvalidCharactersLabel.Enabled = true;
-        }
-
-        private void CheckRecursive()
-        {
             try
             {
-                var files = Directory.EnumerateFiles(PathToCheckTextBox.Text, "*.*", SearchOption.AllDirectories).Select(i => new FileInfo(i));
+                await Task.Run(() =>
+                    CheckDirectory(
+                        rootPath,
+                        checkMaxLength,
+                        maxLength,
+                        checkInvalidCharacters,
+                        invalidCharacters
+                    )
+                );
 
-                foreach (var fl in files)
+                bool wasStopped = !Globals.IsWorking;
+
+                stopwatch.Stop();
+
+                if (wasStopped)
+                    ResultsAdd("Stopped. It ran for " + stopwatch.Elapsed);
+                else if (scanHadErrors)
+                    ResultsAdd("Finished with errors. It took " + stopwatch.Elapsed);
+                else
+                    ResultsAdd("Finished successfully. It took " + stopwatch.Elapsed);
+            }
+            catch (Exception exception)
+            {
+                stopwatch.Stop();
+                ResultsAdd("Unexpected error: " + exception.Message);
+            }
+            finally
+            {
+                Globals.IsWorking = false;
+                StatusLabelUpdate();
+
+                StartButton.Enabled = true;
+                StopButton.Enabled = false;
+                InvalidCharactersLabel.Enabled = true;
+            }
+        }
+
+        
+
+     
+        private void CheckDirectory(
+            string path,
+            bool checkMaxLength,
+            int maxLength,
+            bool checkInvalidCharacters,
+            string[] invalidCharacters)
+        {
+            if (!Globals.IsWorking)
+                return;
+
+            try
+            {
+                foreach (string filePath in Directory.EnumerateFiles(path))
                 {
-                    if (Globals.IsWorking)
-                    {
-                        CheckOne(fl);
-                        
-                    }
-                    else break;
-                    
+                    if (!Globals.IsWorking)
+                        return;
+
+                    CheckOne(
+                        new FileInfo(filePath),
+                        checkMaxLength,
+                        maxLength,
+                        checkInvalidCharacters,
+                        invalidCharacters
+                    );
                 }
 
-                var dirs = Directory.EnumerateDirectories(PathToCheckTextBox.Text, "*.*", SearchOption.AllDirectories).Select(i => new FileInfo(i));
-                foreach (var dr in dirs)
+                foreach (string directoryPath in Directory.EnumerateDirectories(path))
                 {
-                    if (Globals.IsWorking)
-                    {
-                        CheckOne(dr);
-                        
-                    }
-                    else break;
+                    if (!Globals.IsWorking)
+                        return;
 
+                    var directory = new DirectoryInfo(directoryPath);
+
+                    // Skip Synology recycle folders.
+                    if (IgnoredDirectories.Contains(directory.Name))
+                    {
+                        ResultsAdd("Skipped system folder: " + directory.FullName);
+                        continue;
+                    }
+
+                    CheckOne(
+                        directory,
+                        checkMaxLength,
+                        maxLength,
+                        checkInvalidCharacters,
+                        invalidCharacters
+                    );
+
+                    CheckDirectory(
+                        directoryPath,
+                        checkMaxLength,
+                        maxLength,
+                        checkInvalidCharacters,
+                        invalidCharacters
+                    );
                 }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                scanHadErrors = true;
+                ResultsAdd("Skipped, no permission: " + path);
+            }
+            catch (IOException e)
+            {
+                scanHadErrors = true;
+                ResultsAdd("Could not check: " + path + " — " + e.Message);
             }
             catch (Exception e)
             {
-                ResultsAdd("Exception: " + e.Message);
+                scanHadErrors = true;
+                ResultsAdd("Exception checking " + path + ": " + e.Message);
             }
         }
-
-        private void CheckOne(FileInfo FileOrFolder)
+        private void CheckOne(
+            FileSystemInfo fileOrFolder,
+            bool checkMaxLength,
+            int maxLength,
+            bool checkInvalidCharacters,
+            string[] invalidCharacters)
         {
-            if (MaxLengthCheckbox.Checked)
+            if (checkMaxLength && fileOrFolder.Name.Length > maxLength)
             {
-                if (FileOrFolder.Name.Length >= Convert.ToInt32(MaxLengthTextbox.Text))
-                {
-                    ResultsAdd("");
-                    ResultsAdd(IsFileOrFolderPretty(FileOrFolder, true) + " name too long: " + FileOrFolder.Name);
-                    ResultsAdd("Location: " + FileOrFolder.FullName);
-                    ResultsAdd("");
-                }
+                ResultsAdd(
+                    Environment.NewLine +
+                    IsFileOrFolderPretty(fileOrFolder, true) +
+                    " name too long: " + fileOrFolder.Name +
+                    Environment.NewLine +
+                    "Location: " + fileOrFolder.FullName +
+                    Environment.NewLine
+                );
             }
-            if (InvalidCharactersCheckbox.Checked)
+
+            if (checkInvalidCharacters)
             {
-                foreach (string Character in Globals.InvalidCharacters)
+                foreach (string character in invalidCharacters)
                 {
-                    if (FileOrFolder.Name.IndexOf(Character) != -1) 
+                    if (fileOrFolder.Name.Contains(
+                        character,
+                        StringComparison.Ordinal))
                     {
-                        ResultsAdd("");
-                        ResultsAdd(IsFileOrFolderPretty(FileOrFolder, true) + " contains invalid characters: " + FileOrFolder.Name);
-                        ResultsAdd("Location: " + FileOrFolder.FullName);
-                        ResultsAdd("");
+                        ResultsAdd(
+                            Environment.NewLine +
+                            IsFileOrFolderPretty(fileOrFolder, true) +
+                            " contains invalid character \"" + character + "\": " +
+                            fileOrFolder.Name +
+                            Environment.NewLine +
+                            "Location: " + fileOrFolder.FullName +
+                            Environment.NewLine
+                        );
                     }
                 }
             }
-
-        }
-
-        // Timer ended event
-        private void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            StatusLabelUpdate();
         }
 
         private void StopButton_Click(object sender, EventArgs e)
@@ -282,39 +379,16 @@ namespace File_Name_Checker
             ForceStop();   
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="FileOrFolder"></param>
-        /// <returns>0 for file, 1 for directory</returns>
-        private int IsFileOrFolder(FileInfo FileOrFolder)
+        private string IsFileOrFolderPretty(
+            FileSystemInfo fileOrFolder,
+            bool isCapitalFirstLetter)
         {
-            var attributes = File.GetAttributes(FileOrFolder.FullName);
+            bool isFolder = fileOrFolder is DirectoryInfo;
 
-            bool isDirectory = attributes.HasFlag(FileAttributes.Directory);
+            if (isFolder)
+                return isCapitalFirstLetter ? "Folder" : "folder";
 
-            if (isDirectory) return 1;
-            else return 0;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="FileOrFolder"></param>
-        /// <param name="IsCapitalFirstLetter"></param>
-        /// <returns>File or file / Folder or folder</returns>
-        private string IsFileOrFolderPretty(FileInfo FileOrFolder, bool IsCapitalFirstLetter)
-        {
-            if (IsFileOrFolder(FileOrFolder) == 0)
-            {
-                if (IsCapitalFirstLetter) return "File";
-                else return "file";
-            }
-            else
-            {
-                if (IsCapitalFirstLetter) return "Folder";
-                else return "folder";
-            }
+            return isCapitalFirstLetter ? "File" : "file";
         }
 
         private void MenuAbout_Click(object sender, EventArgs e)
