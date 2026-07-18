@@ -164,14 +164,6 @@ namespace File_Name_Checker
             Globals.IsWorking = false;
             StopButton.Enabled = false;
             ResultsAdd("Stopping...");
-
-            /*
-            StartButton.Enabled = true;
-            StopButton.Enabled = false;
-            InvalidCharactersLabel.Enabled = true;
-            ResultsAdd("Attempting to force stop.");
-            Globals.IsWorking = false;
-            */
         }
 
         private async void StartButton_Click(object sender, EventArgs e)
@@ -214,7 +206,9 @@ namespace File_Name_Checker
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
+            scanHadErrors = false;
             Globals.IsWorking = true;
+
             StatusLabelUpdate();
             ResultsAdd("Starting");
 

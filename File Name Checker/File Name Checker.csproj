@@ -10,9 +10,9 @@
     <ApplicationIcon>FileNameCheckerIcon.ico</ApplicationIcon>
     <Copyright>JeFawk from Smol Spaghettorium (Andrei Pistol)</Copyright>
     <RepositoryUrl>https://github.com/JeFawk/FileNameChecker-App-Code</RepositoryUrl>
-	<Version>1.0.1</Version>
-	<AssemblyVersion>1.0.1.0</AssemblyVersion>
-	<FileVersion>1.0.1.0</FileVersion>
+	<Version>1.0.2</Version>
+	<AssemblyVersion>1.0.2.0</AssemblyVersion>
+	<FileVersion>1.0.2.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
